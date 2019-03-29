@@ -16,10 +16,9 @@ import pandas as pd
 import numpy as np
 import pickle                  # OPTIONAL, if not needed, ignore it
 from sklearn.model_selection import train_test_split
-#ROOT = os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))), 'Project1') #CodeFramework替换成项目名
-ROOT = os.path.join("/home/jerrry/Docments/DataSciencePrinciples", "Project1")
+ROOT = os.path.abspath(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) #CodeFramework替换成项目名
 
-DATAROOT = os.path.join(ROOT, 'Animals_with_Attributes2', 'Features', 'ResNet101')#dataset替换成数据集名称
+DATAROOT = os.path.join(ROOT, 'data', 'Animals_with_Attributes2-2', 'Features', 'ResNet101')#dataset替换成数据集名称
 
 
 
@@ -90,8 +89,16 @@ class Data():#在其中拆分数据的属性并定义数据预处理的函数
         fw_trainX.close()
         fw_trainY.close()
         fw_testX.close()
-        fw.testY.close()
+        fw_testY.close()
         # If want to read, use:
         # x = open("xxx", 'rb')
         # y = pickle.load(x)
         # x.close()
+
+if __name__ == '__main__':
+    dataset = Data()
+    trainX, testX, trainY, testY = dataset.Get_Train_Test()
+    print(trainX.shape)
+    print(testX.shape)
+    print(trainY.shape)
+    print(testY.shape)
