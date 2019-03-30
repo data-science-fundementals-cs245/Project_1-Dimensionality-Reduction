@@ -1,4 +1,8 @@
 #-*- coding:utf-8 -*-
+import os, sys
+root_path = os.path.abspath(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(root_path)
+
 import sklearn.discriminant_analysis as sk_discriminant_analysis
 import sklearn.decomposition as sk_decomposition
 from sklearn.svm import SVC
@@ -7,6 +11,7 @@ from sklearn.model_selection import GridSearchCV, train_test_split
 import matplotlib.pyplot as plt
 from sklearn import manifold
 import numpy as np
+import pickle as pkl
 
 class Reducer:
 
@@ -48,16 +53,16 @@ class Reducer:
         scaler = StandardScaler()
         x_std = scaler.fit_transform(x)
         x_train, x_test, y_train, y_test = train_test_split(x_std, train_y, test_size=0.4)
-        svc = SVC(kernel='rbf', class_weight='balanced', )
+        svc = SVC(kernel='linear', class_weight='balanced', )
         c_range = np.logspace(-2, 10, 4, base=2)
         gamma_range = np.logspace(-5, 3, 5, base=2)
-        param_grid = [{'kernel': ['rbf'], 'C': c_range, 'gamma': gamma_range}]
+        param_grid = [{'kernel': ['linear'], 'C': c_range, 'gamma': gamma_range}]
         grid = GridSearchCV(svc, param_grid, cv=3, n_jobs=-1)
         clf = grid.fit(x_train, y_train)
         score = grid.score(x_test, y_test)
         return score
 
-    def ForwardSelection(self, train_X, train_y, test_X, aim_acc, max_dims):
+    def ForwardSelection(self, train_X, train_y, test_X, aim_acc, max_dims, method, step):
         n_samples = train_X.shape[0]
         choices = np.arange(n_samples)
         np.random.shuffle(choices)
@@ -67,14 +72,56 @@ class Reducer:
 
         selection = []
         dims = 0
-        choices = np.arange(train_X.shape[1])
-        np.random.shuffle(choices)
+        if method == 'random':
+            choices = np.arange(train_X.shape[1])
+            np.random.shuffle(choices)
+        elif method == 'importances':
+            f = open('data/feature_importances_order.pkl', 'rb')
+            choices = pkl.load(f)
+            choices = choices[::-1]
+        else:
+            raise ValueError
+
+        print("Start Forward Selection!\naim_acc={0}, max_dims={1}, method={2}, step={3}".format(aim_acc, max_dims, method, step))
         while True:
-            selection.append(choices[dims])
-            dims += 1
+            for i in range(step):
+                selection.append(choices[dims])
+                dims += 1
             acc = self.evaluation(selection, train_X, train_y)
             print('dims =', dims, '; acc =', acc)
             if acc >= aim_acc or dims >= max_dims:
+                break
+
+        mask = np.array(sorted(selection))
+        test_X = test_X[:, mask]
+        return train_X[:, mask], train_y, test_X
+
+    def BackwardSelection(self, train_X, train_y, test_X, aim_acc, max_dims, method, step):
+        n_samples = train_X.shape[0]
+        choices = np.arange(n_samples)
+        np.random.shuffle(choices)
+        train_X = train_X[choices][:int(n_samples / 10)]
+        train_y = train_y[choices][:int(n_samples / 10)]
+        train_y.reshape((-1, 1))
+
+        selection = np.arange(train_X.shape[1]).tolist()
+        d = 0
+        if method == 'random':
+            choices = np.arange(train_X.shape[1])
+            np.random.shuffle(choices)
+        elif method == 'importances':
+            f = open('data/feature_importances_order.pkl', 'rb')
+            choices = pkl.load(f)
+        else:
+            raise ValueError
+        print("Start Backward Selection!\naim_acc={0}, max_dims={1}, method={2}, step={3}".format(aim_acc, max_dims, method, step))
+        while True:
+            for i in range(step):
+                selection.remove(choices[d])
+                d += 1
+            acc = self.evaluation(selection, train_X, train_y)
+            print('dims =', len(selection), '; acc =', acc)
+            if acc <= aim_acc or len(selection) <= max_dims:
                 break
 
         mask = np.array(sorted(selection))
@@ -93,7 +140,9 @@ class Reducer:
         elif self.type == 'FS':
             aim_acc = opt.aim_acc
             max_dims = opt.max_dims
-            train_X, train_y, test_X = self.ForwardSelection(train_X, train_y, test_X, aim_acc, max_dims)
+            method = opt.method
+            step = opt.step
+            train_X, train_y, test_X = self.ForwardSelection(train_X, train_y, test_X, aim_acc, max_dims, method, step)
         else:
             raise ValueError
 
