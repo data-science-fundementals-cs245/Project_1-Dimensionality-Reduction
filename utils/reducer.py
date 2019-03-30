@@ -4,6 +4,8 @@ import sklearn.decomposition as sk_decomposition
 from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV, train_test_split
+import matplotlib.pyplot as plt
+from sklearn import manifold
 import numpy as np
 
 class Reducer:
@@ -32,6 +34,13 @@ class Reducer:
         test_X = lda.transform(test_X)
 
         return train_X, train_y, test_X
+
+    def t_SNE(self, X, Y, seed, dims):
+        print ("TSNE:")
+        tsne = t-SNE_reduce(X, Y, seed, dims)
+        reduced_X = tsne.fit_transform()
+        # plot graph, only support 2d graphs
+        # tsne.plot_2d_graph(reduced_X)
 
     def evaluation(self, selection, train_X, train_y):
         mask = np.array(sorted(selection))
@@ -88,5 +97,32 @@ class Reducer:
         else:
             raise ValueError
 
-        return train_X, test_X, train_y, test_y
+return train_X, test_X, train_y, test_y
 
+
+class t-SNE_reduce:
+    def __init__(self, features=None, labels=None, seed=0, n_dimensions=2):
+        self.features = features
+        self.labels = labels
+        self.seed = seed
+        self.n_dimensions = n_dimensions
+
+    def fit_transform(self):
+        tsne = manifold.TSNE(n_component=self.n_dimensions, init='pca', random_state=self.seed)
+        X_tsne = tsne.fit_transform(self.features)
+        print ("原数据维度为：{}; 降维后数据维度为：{}".format(X.shape[-1], X_tsne.shape[-1]))
+
+        return X_tsne
+
+    def plot_2d_graph(self, X_tsne):
+        # x.min(0) -> Take the min value of each column
+        # The following steps normalize each dimension
+        x_min, x_max = X_tsne.min(0), X_tsne.max(0)
+        X_norm = (X_tsne - x_min) / (x_max - x_min)
+        plt.figure(figsize=(8, 8))
+        for i in range(X_norm.shape[0]):
+            plt.text(X_norm[i, 0], X_norm[i, 1], str(self.labels[i]), color=plt.cm.Set1(self.labels[i]),
+                    fontdict={'weight': 'bold', 'size':9})
+        plt.xticks([])
+        plt.yticks([])
+        plt.show()
