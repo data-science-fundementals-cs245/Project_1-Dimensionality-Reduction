@@ -37,7 +37,7 @@ class Reducer:
 
     def t_SNE(self, X, Y, seed, dims):
         print ("TSNE:")
-        tsne = t-SNE_reduce(X, Y, seed, dims)
+        tsne = t_SNE_reduce(X, Y, seed, dims)
         reduced_X = tsne.fit_transform()
         # plot graph, only support 2d graphs
         # tsne.plot_2d_graph(reduced_X)
@@ -97,10 +97,10 @@ class Reducer:
         else:
             raise ValueError
 
-return train_X, test_X, train_y, test_y
+        return train_X, test_X, train_y, test_y
 
 
-class t-SNE_reduce:
+class t_SNE_reduce:
     def __init__(self, features=None, labels=None, seed=0, n_dimensions=2):
         self.features = features
         self.labels = labels
@@ -108,7 +108,7 @@ class t-SNE_reduce:
         self.n_dimensions = n_dimensions
 
     def fit_transform(self):
-        tsne = manifold.TSNE(n_component=self.n_dimensions, init='pca', random_state=self.seed)
+        tsne = manifold.TSNE(n_components=self.n_dimensions, init='pca', random_state=self.seed)
         X_tsne = tsne.fit_transform(self.features)
         print ("原数据维度为：{}; 降维后数据维度为：{}".format(X.shape[-1], X_tsne.shape[-1]))
 
