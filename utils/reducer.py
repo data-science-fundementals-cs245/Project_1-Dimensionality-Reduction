@@ -159,7 +159,7 @@ class t_SNE_reduce:
     def fit_transform(self):
         tsne = manifold.TSNE(n_components=self.n_dimensions, init='pca', random_state=self.seed)
         X_tsne = tsne.fit_transform(self.features)
-        print ("原数据维度为：{}; 降维后数据维度为：{}".format(X.shape[-1], X_tsne.shape[-1]))
+        print ("原数据维度为：{}; 降维后数据维度为：{}".format(self.features.shape[-1], X_tsne.shape[-1]))
 
         return X_tsne
 
