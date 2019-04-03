@@ -39,10 +39,8 @@ Sparse Coding|5.00|10.18|15.46|20.20|35.03|50.08|66.87|81.70|88.93|91.02|
 LLE|||||||||||
 Auto-Encoder|||||||||||
 
-##Feature Selection
-
-###SelectKBest
-
+## Feature Selection
+### SelectKBest
 score_function | 2 | 4 | 8 | 16 | 32 | 64 | 128 | 256 | 512 | 1024 |
 -|-|-|-|-|-|-|-|-|-|-|-
 f_classif|15.8|28.73|43.02|63.07|78.61|87.05|89.83|91.6|92.47|93|
@@ -51,8 +49,7 @@ mutual_info_classif|18.18|32.41|53.84|71.14|81.68|86.88|89.99|91.91|92.55|93.02|
 
 降维花费时间mutual_info_classif大概是前两者的50-150倍
 
-###Forward Selection
-
+### Forward Selection
 evaluation 使用数据为三分之一的训练集。
 
 选取特征顺序为feature_importances的降序（使用Extra-Trees模型得到的特征对分类的重要度）：
