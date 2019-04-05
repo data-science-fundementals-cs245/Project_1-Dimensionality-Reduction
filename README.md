@@ -51,7 +51,7 @@ Auto-Encoder|||||||||||
 降维花费时间mutual_info_classif大概是前两者的50-150倍
 
 ### Forward Selection
-evaluation 使用数据为三分之一的训练集。
+##### A. evaluation 使用数据为三分之一的训练集数据
 
 选取特征顺序为feature_importances的降序（使用Extra-Trees模型得到的特征对分类的重要度）：
 
@@ -73,7 +73,17 @@ max_dims = 1000(实验发现并不需要到1000维)
 | eval_acc | 70.2  | 76.03 | 80.56 | 85.32 | 87.7 |
 | acc     | 71.08 | 76.63 | 80.94 | 85.6  | 90.9 |
 
+##### B. evaluation 使用数据为十分之一的训练集数据
+选取特征顺序为feature_importances的降序（使用Extra-Trees模型得到的特征对分类的重要度）：
+max_dims = 1000(实验发现并不需要到1000维)
+| aim_acc | 0.7   | 0.75  | 0.8   | 0.85  | 0.9   |
+| ------- | ----- | ----- | ----- | ----- | ----- |
+| step    | 2     | 2     | 2     | 5     | 5     |
+| dims    | 34    | 40    | 60    | 115   | 1000  |
+| eval_acc | 72.29 | 76.54 | 80.34 | 85.59 | 87.37 |
+| acc     | 72.63 | 75.94 | 80.52 | 84.37 | 89.47 |
 #### Forward Selection 结果分析角度参考：
 - 比较两种特征选取顺序要达到同样aim_acc需要的dims（random方法在evaluation上可能由于样本不够多，eval_acc很难达到0.9）
 - 比较eval_acc与在全部数据集上得到的最终结果acc的差距
 - 比较两种特征选取顺序在FS过程中eval_acc随着dims增大的变化曲线（数据另外传）
+- 在importances特征选取顺序下，evaluation数据集规模对evaluation准确度的分析，可以看到在evaluation使用的数据比较少时，估计出来的eval_acc与实际acc相差大一些，且eval_acc无法达到比较高的准确度，这可能是由于样本太少，模型欠拟合
